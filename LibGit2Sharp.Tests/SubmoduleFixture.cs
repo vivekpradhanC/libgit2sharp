@@ -151,5 +151,142 @@ namespace LibGit2Sharp.Tests
                 Assert.Equal(SubmoduleStatus.IndexModified, statusAfter & SubmoduleStatus.IndexModified);
             }
         }
+
+        [Fact]
+        public void CanInitSubmodule()
+        {
+            var path = CloneSubmoduleSmallTestRepo();
+            string submoduleName = "submodule_target_wd";
+
+            using (var repo = new Repository(path))
+            {
+                var submodule = repo.Submodules[submoduleName];
+
+                Assert.NotNull(submodule);
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.WorkDirUninitialized) == SubmoduleStatus.WorkDirUninitialized);
+
+                var configEntryBeforeInit = repo.Config.Get<string>(string.Format("submodule.{0}.url", submoduleName));
+                Assert.Null(configEntryBeforeInit);
+
+                submodule.Init(false);
+
+                var configEntryAfterInit = repo.Config.Get<string>(string.Format("submodule.{0}.url", submoduleName));
+                Assert.NotNull(configEntryAfterInit);
+
+                // TODO: The relative path should probably be expanded in libgit2
+                // as part of init...
+                Assert.Equal("../submodule_target_wd", configEntryAfterInit.Value);
+            }
+        }
+
+        [Fact]
+        public void UpdatingUninitializedSubmoduleThrows()
+        {
+            var path = CloneSubmoduleSmallTestRepo();
+            string submoduleName = "submodule_target_wd";
+
+            using (var repo = new Repository(path))
+            {
+                var submodule = repo.Submodules[submoduleName];
+
+                Assert.NotNull(submodule);
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.WorkDirUninitialized) == SubmoduleStatus.WorkDirUninitialized);
+
+                Assert.Throws<LibGit2SharpException>(() => submodule.Update(false));
+            }
+        }
+
+        [Fact]
+        public void CanUpdateSubmodule()
+        {
+            var path = CloneSubmoduleSmallTestRepo();
+            string submoduleName = "submodule_target_wd";
+
+            using (var repo = new Repository(path))
+            {
+                var submodule = repo.Submodules[submoduleName];
+
+                Assert.NotNull(submodule);
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.WorkDirUninitialized) == SubmoduleStatus.WorkDirUninitialized);
+
+                submodule.Init(false);
+
+                // Manually expand the relative submodule url here - lg2 complains that "../submodule_target_wd" is an unsupported URL protocol.
+                // Need to investigate further...
+                string submoduleUrl = repo.Config.Get<string>(string.Format("submodule.{0}.url", submoduleName), ConfigurationLevel.Local).Value;
+                repo.Config.Set<string>(string.Format("submodule.{0}.url", submoduleName), Path.Combine(path, submoduleUrl));
+
+                submodule.Update(false);
+
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.InWorkDir) == SubmoduleStatus.InWorkDir);
+                Assert.Equal((ObjectId)"480095882d281ed676fe5b863569520e54a7d5c0", submodule.HeadCommitId);
+                Assert.Equal((ObjectId)"480095882d281ed676fe5b863569520e54a7d5c0", submodule.IndexCommitId);
+                Assert.Equal((ObjectId)"480095882d281ed676fe5b863569520e54a7d5c0", submodule.WorkDirCommitId);
+            }
+        }
+
+        [Fact(Skip = "Skipping due issue with relative local urls.")]
+        public void CanUpdateUnitializedSubmodule()
+        {
+            var path = CloneSubmoduleSmallTestRepo();
+            string submoduleName = "submodule_target_wd";
+
+            using (var repo = new Repository(path))
+            {
+                var submodule = repo.Submodules[submoduleName];
+
+                Assert.NotNull(submodule);
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.WorkDirUninitialized) == SubmoduleStatus.WorkDirUninitialized);
+
+                submodule.Update(true);
+
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.InWorkDir) == SubmoduleStatus.InWorkDir);
+                Assert.Equal((ObjectId)"480095882d281ed676fe5b863569520e54a7d5c0", submodule.HeadCommitId);
+                Assert.Equal((ObjectId)"480095882d281ed676fe5b863569520e54a7d5c0", submodule.IndexCommitId);
+                Assert.Equal((ObjectId)"480095882d281ed676fe5b863569520e54a7d5c0", submodule.WorkDirCommitId);
+            }
+        }
+
+        [Fact]
+        public void CanUpdateSubmoduleAfterCheckout()
+        {
+            var path = CloneSubmoduleSmallTestRepo();
+            string submoduleName = "submodule_target_wd";
+
+            using (var repo = new Repository(path))
+            {
+                var submodule = repo.Submodules[submoduleName];
+
+                Assert.NotNull(submodule);
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.WorkDirUninitialized) == SubmoduleStatus.WorkDirUninitialized);
+
+                submodule.Init(false);
+
+                // Manually expand the relative submodule url here - lg2 complains that "../submodule_target_wd" is an unsupported URL protocol.
+                // Need to investigate further...
+                string submoduleUrl = repo.Config.Get<string>(string.Format("submodule.{0}.url", submoduleName), ConfigurationLevel.Local).Value;
+                repo.Config.Set<string>(string.Format("submodule.{0}.url", submoduleName), Path.Combine(path, submoduleUrl));
+
+                submodule.Update(false);
+
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.InWorkDir) == SubmoduleStatus.InWorkDir);
+
+                repo.Checkout("alternate");
+                Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.WorkDirModified) == SubmoduleStatus.WorkDirModified);
+
+                submodule = repo.Submodules[submoduleName];
+
+                Assert.Equal((ObjectId)"5e4963595a9774b90524d35a807169049de8ccad", submodule.HeadCommitId);
+                Assert.Equal((ObjectId)"5e4963595a9774b90524d35a807169049de8ccad", submodule.IndexCommitId);
+                Assert.Equal((ObjectId)"480095882d281ed676fe5b863569520e54a7d5c0", submodule.WorkDirCommitId);
+
+                submodule.Update(false);
+                submodule = repo.Submodules[submoduleName];
+
+                Assert.Equal((ObjectId)"5e4963595a9774b90524d35a807169049de8ccad", submodule.HeadCommitId);
+                Assert.Equal((ObjectId)"5e4963595a9774b90524d35a807169049de8ccad", submodule.IndexCommitId);
+                Assert.Equal((ObjectId)"5e4963595a9774b90524d35a807169049de8ccad", submodule.WorkDirCommitId);
+            }
+        }
     }
 }

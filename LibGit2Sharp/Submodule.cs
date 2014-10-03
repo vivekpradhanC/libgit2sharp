@@ -110,6 +110,80 @@ namespace LibGit2Sharp
         }
 
         /// <summary>
+        /// Initialize submodule
+        /// </summary>
+        /// <param name="overwrite">Overwrite existing entries.</param>
+        public virtual void Init(bool overwrite)
+        {
+            using (var handle = Proxy.git_submodule_lookup(repo.Handle, Name))
+            {
+                Proxy.git_submodule_init(handle, overwrite);
+            }
+        }
+
+        /// <summary>
+        /// Update a submodule.
+        /// <para>
+        ///   This will 1) Optionally initialize the if it not already initialzed,
+        ///   2) clone the sub repository if it has not already been cloned, and
+        ///   3) checkout the commit ID for the submodule in the sub repository.
+        /// </para>
+        /// <param name="init">Initialize the submodule if it is not already initialized.</param>
+        /// </summary>
+        public virtual void Update(bool init)
+        {
+            string submoduleRepoPath = System.IO.Path.Combine(this.repo.Info.WorkingDirectory, this.Path);
+
+            string remoteUrl = this.Url;
+
+            // Get the status of the submodule to determine
+            // if we need to clone it or not.
+            var submoduleStatus = this.RetrieveStatus();
+
+            // If submodule is not in WorkDir, but is initialized, then clone
+            if (submoduleStatus.HasFlag(SubmoduleStatus.WorkDirUninitialized))
+            {
+                // Verify submodule is initialized - information about the 
+                // submodule should exist in .git\config.
+                var configEntry = repo.Config.Get<string>(
+                    string.Format(CultureInfo.InvariantCulture, "submodule.{0}.url", this.Name));
+
+                if (configEntry == null)
+                {
+                    if (init)
+                    {
+                        this.Init(false);
+                    }
+                    else
+                    {
+                        // TODO: throw more specific exception.
+                        throw new LibGit2SharpException(
+                            string.Format(CultureInfo.InvariantCulture, "Submodule {0} is not initialized.", Name));
+                    }
+                }
+                else
+                {
+                    remoteUrl = configEntry.Value;
+                }
+
+                // Do not perform checkout as part of clone, we will checkout
+                // specific commit afterwords.
+                Repository.Clone(remoteUrl, submoduleRepoPath, new CloneOptions() { Checkout = false });
+            }
+
+            // Open the sub repository and check out specified commit.
+            using (var repo = new Repository(submoduleRepoPath))
+            {
+                Commit commit = repo.Lookup<Commit>(this.HeadCommitId);
+
+                Ensure.GitObjectIsNotNull(commit, HeadCommitId.ToString());
+
+                // TODO: Force modifier should not be required here.
+                repo.Checkout(commit, new CheckoutOptions() { CheckoutModifiers = CheckoutModifiers.Force});
+            }
+        }
+
+        /// <summary>
         /// Determines whether the specified <see cref="Object"/> is equal to the current <see cref="Submodule"/>.
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare with the current <see cref="Submodule"/>.</param>

@@ -33,6 +33,8 @@ namespace LibGit2Sharp.Tests.TestHelpers
         public static string MergeRenamesTestRepoWorkingDirPath { get; private set; }
         public static string RevertTestRepoWorkingDirPath { get; private set; }
         public static string SubmoduleTestRepoWorkingDirPath { get; private set; }
+        public static string SubmoduleSmallTestRepoWorkingDirPath { get; private set; }
+
         public static DirectoryInfo ResourcesDirectory { get; private set; }
 
         public static bool IsFileSystemCaseSensitive { get; private set; }
@@ -68,6 +70,7 @@ namespace LibGit2Sharp.Tests.TestHelpers
             MergeTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "merge_testrepo_wd");
             RevertTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "revert_testrepo_wd");
             SubmoduleTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "submodule_wd");
+            SubmoduleSmallTestRepoWorkingDirPath = Path.Combine(ResourcesDirectory.FullName, "submodule_small_wd");
         }
 
         private static bool IsFileSystemCaseSensitiveInternal()
@@ -147,6 +150,15 @@ namespace LibGit2Sharp.Tests.TestHelpers
         {
             var submoduleTarget = Path.Combine(ResourcesDirectory.FullName, "submodule_target_wd");
             return Clone(SubmoduleTestRepoWorkingDirPath, submoduleTarget);
+        }
+
+        public string CloneSubmoduleSmallTestRepo()
+        {
+            var submoduleTarget = Path.Combine(ResourcesDirectory.FullName, "submodule_target_wd");
+            var path = Clone(SubmoduleSmallTestRepoWorkingDirPath, submoduleTarget);
+            Directory.CreateDirectory(Path.Combine(path, "submodule_target_wd"));
+
+            return path;
         }
 
         private string Clone(string sourceDirectoryPath, params string[] additionalSourcePaths)

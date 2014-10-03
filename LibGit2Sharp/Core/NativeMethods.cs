@@ -1433,6 +1433,11 @@ namespace LibGit2Sharp.Core
             SubmoduleSafeHandle submodule);
 
         [DllImport(libgit2)]
+        internal static extern int git_submodule_init(
+            SubmoduleSafeHandle submodule,
+            [MarshalAs(UnmanagedType.Bool)] bool overwrite);
+
+        [DllImport(libgit2)]
         internal static extern int git_tag_annotation_create(
             out GitOid oid,
             RepositorySafeHandle repo,
