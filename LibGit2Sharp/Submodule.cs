@@ -129,6 +129,10 @@ namespace LibGit2Sharp
         ///   3) checkout the commit ID for the submodule in the sub repository.
         /// </para>
         /// <param name="init">Initialize the submodule if it is not already initialized.</param>
+        /// <para>
+        ///   Throws <see cref="UninitializedSubmoduleException"/> when updating an uninitialized submodule
+        ///   that is not also being initialized.
+        /// </para>
         /// </summary>
         public virtual void Update(bool init)
         {
@@ -156,8 +160,7 @@ namespace LibGit2Sharp
                     }
                     else
                     {
-                        // TODO: throw more specific exception.
-                        throw new LibGit2SharpException(
+                        throw new UninitializedSubmoduleException(
                             string.Format(CultureInfo.InvariantCulture, "Submodule {0} is not initialized.", Name));
                     }
                 }
@@ -178,7 +181,8 @@ namespace LibGit2Sharp
 
                 Ensure.GitObjectIsNotNull(commit, HeadCommitId.ToString());
 
-                // TODO: Force modifier should not be required here.
+                // TODO: Force modifier probably should not be required here,
+                //       but it is with current Checkout behavior.
                 repo.Checkout(commit, new CheckoutOptions() { CheckoutModifiers = CheckoutModifiers.Force});
             }
         }

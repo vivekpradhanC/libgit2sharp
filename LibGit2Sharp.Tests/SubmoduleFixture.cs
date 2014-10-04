@@ -192,7 +192,7 @@ namespace LibGit2Sharp.Tests
                 Assert.NotNull(submodule);
                 Assert.True((submodule.RetrieveStatus() & SubmoduleStatus.WorkDirUninitialized) == SubmoduleStatus.WorkDirUninitialized);
 
-                Assert.Throws<LibGit2SharpException>(() => submodule.Update(false));
+                Assert.Throws<UninitializedSubmoduleException>(() => submodule.Update(false));
             }
         }
 

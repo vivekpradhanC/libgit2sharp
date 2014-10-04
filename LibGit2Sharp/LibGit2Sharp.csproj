@@ -164,6 +164,7 @@
     <Compile Include="StashModifiers.cs" />
     <Compile Include="TreeDefinitionExtensions.cs" />
     <Compile Include="TreeEntryTargetType.cs" />
+    <Compile Include="UninitializedSubmoduleException.cs" />
     <Compile Include="UnmatchedPathException.cs" />
     <Compile Include="Core\Handles\ReflogEntrySafeHandle.cs" />
     <Compile Include="Core\Handles\ReflogSafeHandle.cs" />
