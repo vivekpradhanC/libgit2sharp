@@ -1385,6 +1385,10 @@ namespace LibGit2Sharp.Core
             SubmoduleSafeHandle submodule);
 
         [DllImport(libgit2)]
+        internal static extern int git_submodule_sync(
+            SubmoduleSafeHandle submodule);
+
+        [DllImport(libgit2)]
         internal static extern void git_submodule_free(
             IntPtr submodule);
 

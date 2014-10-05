@@ -188,6 +188,17 @@ namespace LibGit2Sharp
         }
 
         /// <summary>
+        /// Syncrhonize a submodule repository's info with the current submodule's remote info.
+        /// </summary>
+        public virtual void Sync()
+        {
+            using (var handle = Proxy.git_submodule_lookup(repo.Handle, Name))
+            {
+                Proxy.git_submodule_sync(handle);
+            }
+        }
+
+        /// <summary>
         /// Determines whether the specified <see cref="Object"/> is equal to the current <see cref="Submodule"/>.
         /// </summary>
         /// <param name="obj">The <see cref="Object"/> to compare with the current <see cref="Submodule"/>.</param>

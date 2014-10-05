@@ -288,5 +288,47 @@ namespace LibGit2Sharp.Tests
                 Assert.Equal((ObjectId)"5e4963595a9774b90524d35a807169049de8ccad", submodule.WorkDirCommitId);
             }
         }
+
+        [Fact]
+        public void CanSyncubmodule()
+        {
+            var path = CloneSubmoduleSmallTestRepo();
+            var submoduleName = "submodule_target_wd";
+            var updatedSubmoduleUrl = "../submodule_target2_wd";
+
+            using (var repo = new Repository(path))
+            {
+                var submodule = repo.Submodules[submoduleName];
+                Assert.NotNull(submodule);
+
+                submodule.Init(false);
+
+                // Manually expand the relative submodule url here - lg2 complains that "../submodule_target_wd" is an unsupported URL protocol.
+                // Need to investigate further...
+                string submoduleUrl = repo.Config.Get<string>(string.Format("submodule.{0}.url", submoduleName), ConfigurationLevel.Local).Value;
+                repo.Config.Set<string>(string.Format("submodule.{0}.url", submoduleName), Path.Combine(path, submoduleUrl));
+                submodule.Update(false);
+
+                // Edit the .gitmodules file to update the submodule URL.
+                var origGitModulesContent = File.ReadAllText(Path.Combine(path, ".gitmodules"));
+                var updatedGitModuleContent = origGitModulesContent.Replace("../submodule_target_wd", updatedSubmoduleUrl);
+                Touch(path, ".gitmodules", updatedGitModuleContent);
+
+                submodule.Sync();
+
+                // Verify that the submodule url entry in .git/config was updated.
+                var configEntryAfterSync = repo.Config.Get<string>(string.Format("submodule.{0}.url", submoduleName));
+                Assert.NotNull(configEntryAfterSync);
+                Assert.Equal(updatedSubmoduleUrl, configEntryAfterSync.Value);
+
+                // Verify that the URL was updated in the submodule repository as well.
+                using(var subrepo = new Repository(Path.Combine(path, submodule.Path)))
+                {
+                    // "git submodule sync" updates the sub repositories, but "git_submodule_sync"
+                    // does not appear to.
+                    Assert.Equal(updatedSubmoduleUrl, subrepo.Network.Remotes["origin"].Url);
+                }
+            }
+        }
     }
 }
