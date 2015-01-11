@@ -1502,10 +1502,18 @@ namespace LibGit2Sharp
                 RemoveFromIndex(treeEntryChanges.Path);
             }
 
-            foreach (TreeEntryChanges treeEntryChanges in changes
-                .Where(tec => tec.Status == ChangeKind.Added || tec.Status == ChangeKind.Modified))
+            foreach (TreeEntryChanges treeEntryChanges in changes)
             {
-                AddToIndex(treeEntryChanges.Path);
+                switch (treeEntryChanges.Status)
+                {
+                    case ChangeKind.Added:
+                    case ChangeKind.Modified:
+                        AddToIndex(treeEntryChanges.Path);
+                        break;
+
+                    default:
+                        continue;
+                }
             }
 
             UpdatePhysicalIndex();
