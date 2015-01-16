@@ -365,5 +365,7 @@ namespace LibGit2Sharp
         /// <param name="options">If set, the options that control the status investigation.</param>
         /// <returns>A <see cref="RepositoryStatus"/> holding the state of all the files.</returns>
         RepositoryStatus RetrieveStatus(StatusOptions options);
+
+        string Describe(Commit commit, DescribeOptions options);
     }
 }

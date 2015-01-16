@@ -738,5 +738,10 @@ namespace LibGit2Sharp
             Proxy.git_index_read(repository.Index.Handle);
             return new RepositoryStatus((Repository)repository, null);
         }
+
+        public static string Describe(this IRepository repository, Commit commit)
+        {
+            return repository.Describe(commit, new DescribeOptions());
+        }
     }
 }

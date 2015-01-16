@@ -1868,6 +1868,14 @@ namespace LibGit2Sharp
             return removed;
         }
 
+        public string Describe(Commit commit, DescribeOptions options)
+        {
+            Ensure.ArgumentNotNull(commit, "commit");
+            Ensure.ArgumentNotNull(options, "options");
+
+            return Proxy.git_describe_commit(handle, commit.Id, options);
+        }
+
         private string DebuggerDisplay
         {
             get
