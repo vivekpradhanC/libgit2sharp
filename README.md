@@ -41,11 +41,11 @@ The CI builds are generously hosted and run on the [Travis][travis] and [AppVeyo
  [master-win-badge]: https://ci.appveyor.com/api/projects/status/8qxcoqdo9kp7x2w9/branch/master?svg=true
  [master-win]: https://ci.appveyor.com/project/libgit2/libgit2sharp/branch/master
  [master-nix-badge]: https://travis-ci.org/libgit2/libgit2sharp.svg?branch=master
- [master-nix]: https://travis-ci.org/libgit2/libgit2sharp?branch=master
+ [master-nix]: https://travis-ci.org/libgit2/libgit2sharp/branches
  [vNext-win-badge]: https://ci.appveyor.com/api/projects/status/8qxcoqdo9kp7x2w9/branch/vNext?svg=true
  [vNext-win]: https://ci.appveyor.com/project/libgit2/libgit2sharp/branch/vNext
  [vNext-nix-badge]: https://travis-ci.org/libgit2/libgit2sharp.svg?branch=vNext
- [vNext-nix]: https://travis-ci.org/libgit2/libgit2sharp?branch=vNext
+ [vNext-nix]: https://travis-ci.org/libgit2/libgit2sharp/branches
 
 ## Quick contributing guide
 
