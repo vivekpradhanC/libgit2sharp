@@ -1,4 +1,4 @@
-version: '{build}'
+version: '0.20.1.{build}'
 
 branches:
   only:
@@ -15,6 +15,18 @@ environment:
     Arch: 64
   - xunit_runner: xunit.console.clr4.x86.exe
     Arch: 32
+
+matrix:
+  fast_finish: true
+
+assembly_info:
+  patch: true
+  file: LibGit2Sharp\Properties\AssemblyInfo.cs
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+
+cache:
+  - packages
 
 build_script:
 - nuget restore "C:\projects\libgit2sharp\LibGit2Sharp.sln"
