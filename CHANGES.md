@@ -7,8 +7,22 @@
  - Issue tracker: <https://github.com/libgit2/libgit2sharp/issues>
  - @libgit2sharp: <http://twitter.com/libgit2sharp>
  - CI servers:
-  - CodeBetter TeamCity: <http://teamcity.codebetter.com/project.html?projectId=LibGit2Sharp&guest=1>
-  - Travis: <https://travis-ci.org/libgit2/libgit2sharp>
+  - Windows (x86/amd64): <https://ci.appveyor.com/project/libgit2/libgit2sharp>
+  - Linux/MacOsX: <https://travis-ci.org/libgit2/libgit2sharp>
+
+## v0.21 - ([diff](https://github.com/libgit2/libgit2sharp/compare/v0.20.1...v0.21))
+
+### Additions
+
+  - TBD
+
+### Changes
+
+  - TBD
+
+### Fixes
+
+  - TBD
 
 ## v0.20.1 - ([diff](https://github.com/libgit2/libgit2sharp/compare/v0.20...v0.20.1))
 
