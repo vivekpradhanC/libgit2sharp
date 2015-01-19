@@ -60,7 +60,6 @@ Remove-Item (Join-Path $projectPath "*.nupkg")
 
 Clean-OutputFolder (Join-Path $projectPath "bin\")
 Clean-OutputFolder (Join-Path $projectPath "obj\")
-Clean-OutputFolder (Join-Path $projectPath "..\Build\")
 
 # The nuspec file needs to be next to the csproj, so copy it there during the pack operation
 Copy-Item (Join-Path $root "LibGit2Sharp.nuspec") $projectPath
@@ -68,18 +67,10 @@ Copy-Item (Join-Path $root "LibGit2Sharp.nuspec") $projectPath
 Push-Location $projectPath
 
 try {
-  $FrameworkVersion = "v4.0.30319"
-  $FrameworkDir = "$($env:SystemRoot)\Microsoft.NET\Framework"
-
-  If (Test-Path "$($env:SystemRoot)\Microsoft.NET\Framework64") {
-    $FrameworkDir = "$($env:SystemRoot)\Microsoft.NET\Framework64"
-  }
-
+  Set-Content -Encoding ASCII $(Join-Path $projectPath "libgit2sharp_hash.txt") $commitSha
   Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Restore "$(Join-Path $projectPath "..\LibGit2Sharp.sln")" }
-  Run-Command { & "$($FrameworkDir)\$($FrameworkVersion)\msbuild.exe" "$projectPath\..\CI\build.msbuild" /property:CommitSha=$commitSha /target:Build }
-  Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Pack -Symbols "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release -Exclude "**/NativeBinaries/**/*.*"}
+  Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Pack -Build -Symbols "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release -Exclude "**/NativeBinaries/**/*.*"}
   Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Pack "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release }
-
 }
 finally {
   Pop-Location
