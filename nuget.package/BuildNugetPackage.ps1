@@ -69,6 +69,8 @@ Push-Location $projectPath
 try {
   Set-Content -Encoding ASCII $(Join-Path $projectPath "libgit2sharp_hash.txt") $commitSha
   Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Restore "$(Join-Path $projectPath "..\LibGit2Sharp.sln")" }
+
+  # Cf. https://stackoverflow.com/questions/21728450/nuget-exclude-files-from-symbols-package-in-nuspec
   Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Pack -Build -Symbols "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release -Exclude "**/NativeBinaries/**/*.*"}
   Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Pack "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release }
 }
