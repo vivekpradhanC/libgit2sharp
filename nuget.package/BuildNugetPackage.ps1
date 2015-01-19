@@ -77,7 +77,8 @@ try {
 
   Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Restore "$(Join-Path $projectPath "..\LibGit2Sharp.sln")" }
   Run-Command { & "$($FrameworkDir)\$($FrameworkVersion)\msbuild.exe" "$projectPath\..\CI\build.msbuild" /property:CommitSha=$commitSha /target:Build }
-  Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")"  Pack -Symbols "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release }
+  Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Pack -Symbols "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release -Exclude "**/NativeBinaries/**/*.*"}
+  Run-Command { & "$(Join-Path $projectPath "..\Lib\NuGet\Nuget.exe")" Pack "$(Join-Path $projectPath "LibGit2Sharp.csproj")" -Prop Configuration=Release }
 
 }
 finally {
