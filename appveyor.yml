@@ -37,8 +37,10 @@ test_script:
 - IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 
 on_success:
-- ps: & "C:\projects\libgit2sharp\nuget.package\BuildNugetPackage.ps1" "$env:APPVEYOR_REPO_COMMIT"
-- ps: Get-ChildItem "C:\projects\libgit2sharp\LibGit2sharp\*.nupkg" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+- ps: >-
+    & "C:\projects\libgit2sharp\nuget.package\BuildNugetPackage.ps1" "$env:APPVEYOR_REPO_COMMIT"
+
+    Get-ChildItem "C:\projects\libgit2sharp\LibGit2sharp\*.nupkg" | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 
 notifications:
 - provider: Email
