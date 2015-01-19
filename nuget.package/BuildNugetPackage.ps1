@@ -84,4 +84,5 @@ try {
 finally {
   Pop-Location
   Remove-Item (Join-Path $projectPath "LibGit2Sharp.nuspec")
+  Set-Content -Encoding ASCII $(Join-Path $projectPath "libgit2sharp_hash.txt") "unknown"
 }
