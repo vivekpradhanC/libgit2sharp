@@ -36,6 +36,11 @@ test_script:
 - '%xunit_runner%  "C:\projects\libgit2sharp\LibGit2Sharp.Tests\bin\Release\LibGit2Sharp.Tests.dll" /appveyor'
 - IF %ERRORLEVEL% NEQ 0 EXIT /B %ERRORLEVEL%
 
+on_success:
+- ps: >-
+
+    "C:\projects\libgit2sharp\nuget.package\BuildNugetPackage.ps1" $env:APPVEYOR_REPO_COMMIT
+
 notifications:
 - provider: Email
   to:
