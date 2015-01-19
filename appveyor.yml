@@ -39,7 +39,7 @@ test_script:
 on_success:
 - ps: >-
 
-    "C:\projects\libgit2sharp\nuget.package\BuildNugetPackage.ps1" "$env:APPVEYOR_REPO_COMMIT"
+    "C:\projects\libgit2sharp\nuget.package\BuildNugetPackage.ps1" "$($env:APPVEYOR_REPO_COMMIT)"
 
 notifications:
 - provider: Email
